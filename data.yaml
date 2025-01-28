@@ -1,0 +1,16 @@
+path: ./NRDD2024  # dataset root dir
+train: images/train  # train images
+val: images/val  # validation images
+
+# NRDD2024 Classes
+names:
+  0: longitudinal_crack  # LC
+  1: transverse_crack   # TC
+  2: alligator_crack    # AC
+  3: pothole           # PH
+  4: patch             # PA
+  5: white_line        # WL
+  6: sealed_crack      # SC
+
+# number of classes
+nc: 7 
