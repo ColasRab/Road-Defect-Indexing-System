@@ -1,0 +1,22 @@
+# Road defects dataset configuration - COCO format
+path: ./road_defects  # dataset root dir (relative to project root)
+train: images/train  # train images folder (relative to path)
+val: images/val  # validation images folder (relative to path)
+
+# Annotations (COCO format)
+train_annotations: annotations/instances_train.json
+val_annotations: annotations/instances_val.json
+test_annotations: annotations/instances_test.json  # optional
+
+# Classes
+names:
+  0: null
+  1: longitudinal_crack
+  2: transverse_crack
+  3: alligator_crack
+  4: pothole
+  5: crossing_blur
+  6: lane_blur
+  7: manhole
+  8: patch
+  9: other_damage 
