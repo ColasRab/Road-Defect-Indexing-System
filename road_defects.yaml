@@ -10,7 +10,6 @@ test_annotations: annotations/instances_test.json  # optional
 
 # Classes
 names:
-  0: null
   1: longitudinal_crack
   2: transverse_crack
   3: alligator_crack
