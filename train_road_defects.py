@@ -1,22 +1,57 @@
 from ultralytics import YOLOv10
 import os
+import shutil
+import random
 
-# Ensure the dataset directories exist
 dataset_dir = os.path.join('datasets', 'road_defects')
 os.makedirs(os.path.join(dataset_dir, 'images', 'train'), exist_ok=True)
 os.makedirs(os.path.join(dataset_dir, 'images', 'val'), exist_ok=True)
-os.makedirs(os.path.join(dataset_dir, 'annotations'), exist_ok=True)
+os.makedirs(os.path.join(dataset_dir, 'labels', 'train'), exist_ok=True)
+os.makedirs(os.path.join(dataset_dir, 'labels', 'val'), exist_ok=True)
 
-# Initialize a new YOLOv10 model from scratch using COCO format
-model = YOLOv10('yolov10m.yaml')  # Using medium size model architecture
+def split_train_val(train_ratio=0.8):
+    """Split the dataset into train and validation sets"""
+    train_label_dir = os.path.join(dataset_dir, 'labels', 'train')
+    val_label_dir = os.path.join(dataset_dir, 'labels', 'val')
+    train_img_dir = os.path.join(dataset_dir, 'images', 'train')
+    val_img_dir = os.path.join(dataset_dir, 'images', 'val')
 
-# Training configuration for COCO format
+    label_files = [f for f in os.listdir(train_label_dir) if f.endswith('.txt')]
+
+    num_val = int(len(label_files) * (1 - train_ratio))
+    val_files = random.sample(label_files, num_val)
+
+    for label_file in val_files:
+        src_label = os.path.join(train_label_dir, label_file)
+        dst_label = os.path.join(val_label_dir, label_file)
+        shutil.move(src_label, dst_label)
+
+        img_name = label_file.replace('.txt', '.jpg')
+        src_img = os.path.join(train_img_dir, img_name)
+        dst_img = os.path.join(val_img_dir, img_name)
+        if os.path.exists(src_img):
+            shutil.move(src_img, dst_img)
+        else:
+            for ext in ['.jpeg', '.png']:
+                img_name = label_file.replace('.txt', ext)
+                src_img = os.path.join(train_img_dir, img_name)
+                dst_img = os.path.join(val_img_dir, img_name)
+                if os.path.exists(src_img):
+                    shutil.move(src_img, dst_img)
+                    break
+
+split_train_val()
+
+# Creating blank YOLOv10 model
+model = YOLOv10('yolov10s.yaml')
+
+# Training config
 training_args = {
-    'data': os.path.abspath('road_defects.yaml'),  # use absolute path
+    'data': os.path.abspath('road_defects.yaml'),
     'epochs': 100,
     'imgsz': 640,
     'batch': 8,
-    'device': 'cpu',
+    'device': 0, 
     'workers': 4,
     'patience': 50,
     'save': True,
@@ -38,7 +73,8 @@ def verify_paths():
     required_paths = [
         os.path.join(base_dir, 'images', 'train'),
         os.path.join(base_dir, 'images', 'val'),
-        os.path.join(base_dir, 'annotations')
+        os.path.join(base_dir, 'labels', 'train'),
+        os.path.join(base_dir, 'labels', 'val')
     ]
     
     for path in required_paths:
@@ -47,19 +83,18 @@ def verify_paths():
             return False
     return True
 
-# Add this before training
 if not verify_paths():
     raise ValueError("Required directories are missing. Please check your dataset structure.")
 
-# Train the model
+# Training the model
 try:
     results = model.train(**training_args)
 except Exception as e:
     print(f"Error during training: {str(e)}")
-    print("Please ensure your dataset is properly organized and annotations are in COCO format")
+    print("Please ensure your dataset is properly organized")
     raise
 
-# Validate the model after training
+# Validation
 val_args = {
     'data': os.path.abspath('road_defects.yaml'),
     'batch': 8,
@@ -72,5 +107,5 @@ val_args = {
 }
 results = model.val(**val_args)
 
-# Save the trained model
-model.save('road_defects_yolov10.pt') 
+# Saving trained model
+model.save('road_defect_detection.pt')
