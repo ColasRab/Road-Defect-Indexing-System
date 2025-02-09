@@ -43,7 +43,7 @@ def split_train_val(train_ratio=0.8):
 split_train_val()
 
 # Creating blank YOLOv10 model
-model = YOLOv10('yolov10s.yaml')
+model = YOLOv10('yolov10s.pt')
 
 # Training config
 training_args = {
