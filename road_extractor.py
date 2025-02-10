@@ -107,35 +107,6 @@ class RoadExtractor:
         
         return road_region, road_mask, segments
 
-    def display_results(self, road_region, road_mask, segments):
-        """
-        Display the original image, superpixel segmentation, road mask, and extracted road region.
-        """
-        plt.figure(figsize=(12, 8))
-        
-        plt.subplot(2, 2, 1)
-        plt.imshow(cv2.cvtColor(self.original_image, cv2.COLOR_BGR2RGB))
-        plt.title("Original Scene Image")
-        plt.axis("off")
-        
-        plt.subplot(2, 2, 2)
-        plt.imshow(mark_boundaries(cv2.cvtColor(self.original_image, cv2.COLOR_BGR2RGB), segments))
-        plt.title("Superpixel Segmentation")
-        plt.axis("off")
-        
-        plt.subplot(2, 2, 3)
-        plt.imshow(road_mask, cmap='gray')
-        plt.title("Road Mask")
-        plt.axis("off")
-        
-        plt.subplot(2, 2, 4)
-        plt.imshow(cv2.cvtColor(road_region, cv2.COLOR_BGR2RGB))
-        plt.title("Extracted Road Region")
-        plt.axis("off")
-        
-        plt.tight_layout()
-        plt.show()
-
     def run(self, num_segments=100, k_clusters=3):
         """
         Run the road extraction pipeline.
