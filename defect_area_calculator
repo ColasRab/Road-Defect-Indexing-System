@@ -1,0 +1,61 @@
+import numpy as np
+import cv2
+
+class DefectAreaCalculator:
+    def __init__(self, focal_length, sensor_height, image_height):
+        """
+        Initialize the DefectAreaCalculator with camera parameters.
+            
+        Parameters:
+            focal_length (float): Focal length of the camera in mm.
+            sensor_height (float): Height of the camera sensor in mm.
+            image_height (int): Height of the image in pixels.
+        """
+
+        self.focal_length = focal_length
+        self.sensor_height = sensor_height
+        self.image_height = image_height
+
+    def calculate_scale(self, distance_to_object):
+        """
+        Calculate the scale (mm per pixel) using the pinhole camera model.
+        
+        Parameters:
+            distance_to_object (float): Distance from the camera to the object in mm.
+        
+        Returns:
+            float: Scale in mm per pixel.
+        """
+
+        scale = (self.sensor_height * distance_to_object) / (self.focal_length * self.image_height)
+        return scale
+    
+    def area_of_defect(self, defect_mask, distance_to_object):
+        """
+        Calculate the area of the defect using the scale and defect mask.
+        
+        Parameters:
+            defect_mask (np.array): Binary mask of the defect in the image.
+            distance_to_object (float): Distance from the camera to the object in mm.
+        
+        Returns:
+            float: Area of the defect in square mm.
+        """
+        scale = self.calculate_scale(distance_to_object)
+        defect_area_pixels = np.sum(defect_mask > 0)
+        defect_area_mm2 = defect_area_pixels * (scale ** 2)
+        return defect_area_mm2
+
+if __name__ == "__main__":
+    focal_length = 4.15
+    sensor_height = 2.76
+    image_height = 1080
+    distance_to_object = 1000
+
+    calculator = DefectAreaCalculator(focal_length, sensor_height, image_height)
+    
+    defect_mask = np.zeros((1080, 1920), dtype=np.uint8)
+    cv2.rectangle(defect_mask, (100, 100), (200, 200), 255, -1)
+    
+    area = calculator.area_of_defect(defect_mask, distance_to_object)
+    print(f"Area of defect: {area} square mm")

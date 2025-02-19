@@ -9,7 +9,7 @@ Custom Model Wrapper for YOLOv10 with Road Extraction
 """
 
 class Road_Yolov10_Model(torch.nn.Module):
-    # Define the Road_Yolov10_Model class.
+    # Road_Yolov10_Model class.
     def __init__(self, model_path, scale_factor=0.5, num_segments=100, k_clusters=3):
         super(Road_Yolov10_Model, self).__init__()
         self.model = model_path
@@ -18,7 +18,7 @@ class Road_Yolov10_Model(torch.nn.Module):
         self.k_clusters = k_clusters
         self.to_tensor = transforms.ToTensor()
 
-    # Define the forward method.
+    # forward method.
     def forward(self, x):
         x_np = x[0].permute(1, 2, 0).detach().cpu().numpy()
         x_np = (x_np * 255).astype(np.uint8)
@@ -38,7 +38,6 @@ class Road_Yolov10_Model(torch.nn.Module):
         detections = self.model(road_tensor)
         return detections
     
-# Define a function to load the model.
 def load_model(model_path):
     model = torch.load(model_path)
     model.eval()

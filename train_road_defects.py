@@ -42,10 +42,9 @@ def split_train_val(train_ratio=0.8):
 
 split_train_val()
 
-# Creating blank YOLOv10 model
-model = YOLOv10('yolov10s.pt')
+#blank model
+model = YOLOv10('yolov10s.yaml')
 
-# Training config
 training_args = {
     'data': os.path.abspath('road_defects.yaml'),
     'epochs': 100,
@@ -79,19 +78,17 @@ def verify_paths():
     
     for path in required_paths:
         if not os.path.exists(path):
-            print(f"Missing required directory: {path}")
+            print(f"Missing: {path}")
             return False
     return True
 
 if not verify_paths():
-    raise ValueError("Required directories are missing. Please check your dataset structure.")
+    raise ValueError("missing dataset paths")
 
-# Training the model
 try:
     results = model.train(**training_args)
 except Exception as e:
-    print(f"Error during training: {str(e)}")
-    print("Please ensure your dataset is properly organized")
+    print(f"error during training: {str(e)}")
     raise
 
 # Validation
@@ -107,5 +104,4 @@ val_args = {
 }
 results = model.val(**val_args)
 
-# Saving trained model
-model.save('road_defect_detection.pt')
+model.save('road_yolov10.pt')

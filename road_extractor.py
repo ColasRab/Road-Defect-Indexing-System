@@ -78,11 +78,15 @@ class RoadExtractor:
         # 5. Cluster the superpixels using KMeans.
         kmeans = KMeans(n_clusters=k_clusters, random_state=42)
         cluster_labels = kmeans.fit_predict(features_norm)
+
+        cluster_map = np.zeros_like(segments, dtype=np.uint8)
+        for seg_id, cl in zip(superpixel_ids, cluster_labels):
+            cluster_map[segments == seg_id] = cl
         
         # 6. Identify the road cluster based on the highest average y-coordinate.
         cluster_y_means = []
         for i in range(k_clusters):
-            y_values = features[cluster_labels == i, 3]  # The y-coordinate is at index 3.
+            y_values = features[cluster_labels == i, 3]
             cluster_y_means.append(np.mean(y_values))
         road_cluster = np.argmax(cluster_y_means)
         
@@ -104,8 +108,9 @@ class RoadExtractor:
             orig_shape = (self.original_image.shape[1], self.original_image.shape[0])
             road_mask = cv2.resize(road_mask, orig_shape, interpolation=cv2.INTER_NEAREST)
             road_region = cv2.resize(road_region, orig_shape, interpolation=cv2.INTER_LINEAR)
+            cluster_map = cv2.resize(cluster_map, orig_shape, interpolation=cv2.INTER_NEAREST)
         
-        return road_region, road_mask, segments
+        return road_region, road_mask, segments, cluster_map
 
     def run(self, num_segments=100, k_clusters=3):
         """
@@ -118,5 +123,38 @@ class RoadExtractor:
         Returns:
             tuple: (road_region, road_mask, segments)
         """
-        road_region, road_mask, segments = self.extract_road_region(self.image, num_segments, k_clusters)
-        return road_region, road_mask, segments
+        road_region, road_mask, segments, cluster_map = self.extract_road_region(self.image, num_segments, k_clusters)
+        return road_region, road_mask, segments, cluster_map
+    
+def main():
+    road_extractor = RoadExtractor("test.jpg", scale_factor=0.5)
+    
+    road_region, road_mask, segments, cluster_map = road_extractor.run(num_segments=100, k_clusters=3)
+
+    segments_boundaries = mark_boundaries(cv2.cvtColor(road_extractor.image, cv2.COLOR_BGR2RGB), segments)
+    
+    fig, ax = plt.subplots(1, 5, figsize=(25, 5))
+    ax[0].imshow(cv2.cvtColor(road_extractor.original_image, cv2.COLOR_BGR2RGB))
+    ax[0].set_title("Original Image")
+    ax[0].axis('off')
+
+    ax[1].imshow(cluster_map, cmap='jet')
+    ax[1].set_title("Superpixel Clusters")
+    ax[1].axis('off')
+
+    ax[2].imshow(segments_boundaries)
+    ax[2].set_title("Superpixel Segments")
+    ax[2].axis('off')
+
+    ax[3].imshow(road_mask, cmap='gray')
+    ax[3].set_title("Road Mask")
+    ax[3].axis('off')
+    
+    ax[4].imshow(cv2.cvtColor(road_region, cv2.COLOR_BGR2RGB))
+    ax[4].set_title("Road Region")
+    ax[4].axis('off')
+    
+    plt.show()
+
+if __name__ == "__main__":  
+    main()

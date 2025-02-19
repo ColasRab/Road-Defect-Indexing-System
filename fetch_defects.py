@@ -5,12 +5,12 @@ from torchvision import transforms
 from road_yolov10 import Road_Yolov10_Model, load_model
 
 def main():
-    # Load the Road_YOLOv10 model for road defects detection.
+    # load the Road_YOLOv10 model for road defects detection.
     yolo_model = load_model('road_yolov10.pt')
     road_yolov10 = Road_Yolov10_Model(yolo_model, scale_factor=0.5, num_segments=100, k_clusters=3)
     road_yolov10.eval()
 
-    # Initialize the video capture device.
+    # init the video capture device.
     cap = cv2.VideoCapture(0)
     if not cap.isOpened():
         print("Error: Could not open video device.")
