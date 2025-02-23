@@ -7,7 +7,7 @@ def preprocess_images(image_dir):
     for img_file in os.listdir(image_dir):
         img_path = os.path.join(image_dir, img_file)
         road_extractor = RoadExtractor(img_path, scale_factor=0.5)
-        road_region, road_mask, segments = road_extractor.extract_road_region(road_extractor.image)
+        road_region, road_mask, segments, _ = road_extractor.extract_road_region(road_extractor.image)
         cv2.imwrite(img_path, road_region)
 
 dataset_dir = os.path.join('datasets', 'road_defects')

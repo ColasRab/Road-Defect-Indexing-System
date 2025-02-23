@@ -1,5 +1,5 @@
 # Images and Labels paths
-path: D:/projects/Road-Defect-Indexing-System/datasets/road_defects  # absolute path
+path: C:/Users/bentl/Desktop/Road-Defect-Indexing-System/datasets/road_defects  # absolute path
 train: images/train
 val: images/val
 
