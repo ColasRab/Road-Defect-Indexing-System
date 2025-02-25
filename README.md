@@ -19,28 +19,34 @@ git submodule update --remote --merge
 ```
 
 ## Setting Up the Virtual Environment
-After cloning the repository, create and activate a virtual environment:
+After cloning the repository, run the setup script to automatically create and activate the virtual environment:
 
 ### **For Windows**
 ```sh
-python -m venv venv
+setup.bat
+```
+To manually activate the virtual environment after running the script:
+```sh
 venv\Scripts\activate
 ```
 
 ### **For Linux/macOS**
 ```sh
-python3 -m venv venv
+bash setup.sh
+```
+To manually activate the virtual environment after running the script:
+```sh
 source venv/bin/activate
 ```
 
 ## Installing Dependencies
-Once the virtual environment is activated, install all required dependencies:
+The setup script will also install all required dependencies automatically. However, if you need to manually install them, run:
 ```sh
 pip install -r requirements.txt
 ```
 
 ## Running the Project
-After installing dependencies, you can start using the project. Ensure that the virtual environment is activated before running any scripts.
+After setting up, you can start using the project. Ensure that the virtual environment is activated before running any scripts.
 
 To deactivate the virtual environment, use:
 ```sh
